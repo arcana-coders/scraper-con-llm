@@ -16,6 +16,11 @@ amazon_pedidos/
 
 ## 🔄 Flujo de Trabajo Completo
 
+**🎯 CONCEPTO CLAVE:** El proyecto mantiene un **CSV acumulativo** que nunca se borra. Cada ejecución:
+1. **SIEMPRE** extrae HTML fresco para detectar nuevas ventas
+2. **SOLO** procesa pedidos que NO están en el CSV existente
+3. **AGREGA** nuevos pedidos al CSV sin eliminar histórico
+
 ### 📝 Prerrequisitos
 1. **Node.js** instalado con las dependencias del proyecto:
    ```powershell
@@ -31,10 +36,41 @@ amazon_pedidos/
 
 ---
 
-## 🚀 Pasos de Ejecución
+## 🧠 **RECOMENDACIÓN: USA CEREBRO**
+
+En lugar de ejecutar cada paso manualmente, usa el script maestro:
+
+```powershell
+python cerebro.py
+```
+
+**Ventajas de CEREBRO:**
+- ✅ **Un solo comando** en lugar de 5 pasos separados
+- ✅ **Login guiado** y seguro (no automatizado)
+- ✅ **Detección inteligente** de solo pedidos nuevos
+- ✅ **Recuperación automática** de errores e interrupciones
+- ✅ **Backup automático** con timestamp
+- ✅ **Logging detallado** con colores y timestamps
+- ✅ **Auto-reset** para próximas ejecuciones
+
+**Los pasos manuales siguientes son solo para debugging o casos especiales.**
+
+---
+
+## 🚀 Pasos de Ejecución Manual
 
 ### Paso 1: Autenticación en Amazon 🔐
-**Script:** `login_amazon.js`
+
+#### **🧠 Con CEREBRO (RECOMENDADO)**
+```powershell
+python cerebro.py
+```
+- CEREBRO te guiará paso a paso
+- Te pedirá ejecutar el login en otra terminal
+- Esperará tu confirmación antes de continuar
+- **MÁS SEGURO**: No automatiza la autenticación
+
+#### **📋 Manual (para debugging)**
 ```powershell
 node scripts/login_amazon.js
 ```
@@ -46,6 +82,13 @@ node scripts/login_amazon.js
 
 **¿Qué genera?**
 - `cookies/session.json` - Archivo con las cookies de autenticación
+
+**🔒 Proceso de Login Seguro:**
+1. Abre el navegador automáticamente
+2. Navega a Amazon Seller Central
+3. **TÚ** completas el login manualmente (incluyendo 2FA)
+4. El script detecta cuando terminas y guarda las cookies
+5. Cierra el navegador automáticamente
 
 **¿Qué necesita?**
 - Conexión a internet
@@ -64,14 +107,18 @@ node scripts/extraer_html_tabla.js
 **¿Qué hace?**
 - Navega automáticamente a la página de pedidos usando las cookies guardadas
 - Descarga el HTML completo de la tabla de pedidos
+- **IMPORTANTE:** Este paso SIEMPRE se ejecuta para detectar nuevas ventas
 - Espera 10 segundos para asegurar la carga de elementos dinámicos
 
 **¿Qué genera?**
-- `html/pedidos_YYYYMMDD.html` - HTML de la página de pedidos con fecha actual
+- `html/pedidos_YYYYMMDD.html` - HTML fresco con TODOS los pedidos actuales
 
 **¿Qué necesita?**
 - `cookies/session.json` (del Paso 1)
 - Sesión válida (no expirada)
+
+**📊 Resultado esperado:**
+- HTML actualizado que contiene nuevos pedidos + pedidos ya procesados
 
 **✅ Indicador de éxito:** Se crea un archivo HTML en la carpeta `html/`
 
@@ -212,10 +259,21 @@ const URL_PEDIDOS = 'https://sellercentral.amazon.com/orders-v3/mfn/unshipped/?p
 ## 📊 Archivos de Salida Final
 
 Al completar todo el flujo, tendrás:
-- **`csv/pedidos_consolidados.json`** - Datos completos en formato JSON
-- **`csv/pedidos_consolidados.csv`** - Datos completos en formato CSV
+- **`csv/pedidos_consolidados.json`** - Datos completos en formato JSON (acumulativo)
+- **`csv/pedidos_consolidados.csv`** - Datos completos en formato CSV (acumulativo)
 - **`html_pedidos/`** - Respaldo HTML de cada pedido individual
-- **`csv/backup/`** - Respaldos de versiones anteriores
+- **`csv/backup/`** - Respaldos automáticos con timestamp
+
+### 💾 **Sistema de Backup Inteligente:**
+- **CEREBRO**: Crea backups automáticos con timestamp al final de cada ejecución
+- **Manual**: Debes crear backups manualmente antes de ejecutar
+- **Formato**: `pedidos_consolidados_YYYYMMDD_HHMMSS.csv/json`
+- **Ubicación**: `csv/backup/`
+
+### 📈 **CSV Acumulativo:**
+- **Nunca se borra**: Solo se agregan nuevos pedidos
+- **Histórico completo**: Perfecto para análisis de tendencias
+- **Detección inteligente**: Solo procesa pedidos que no están en el archivo
 
 ---
 

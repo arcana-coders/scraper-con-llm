@@ -4,7 +4,17 @@ Un sistema automatizado para extraer, procesar y analizar datos de pedidos desde
 
 ## 📋 Tabla de Contenidos
 
-- [Características](#-características)
+- [Características](#-c### Características del CEREBRO:
+
+- **🔒 Login Seguro**: No automatiza autenticación, te guía paso a paso
+- **🔄 Ejecución Inteligente**: Ejecuta solo lo necesario sin intervención  
+- **💾 Sistema de Estados**: Recupera desde interrupciones automáticamente
+- **🎨 Logging Detallado**: Output con colores y timestamps en tiempo real
+- **✅ Verificaciones**: Valida prerrequisitos antes de cada paso
+- **⚡ Detección Inteligente**: Solo procesa pedidos nuevos vs CSV existente
+- **🛡️ Manejo de Errores**: Mensajes claros y recuperación automática
+- **💾 Backup Automático**: Crea respaldos con timestamp después de cada ejecución
+- **🔄 Auto-Reset**: Se limpia automáticamente para próximas ejecucionessticas)
 - [Tecnologías](#-tecnologías)
 - [Prerrequisitos](#-prerrequisitos)
 - [Instalación](#-instalación)
@@ -62,7 +72,7 @@ Un sistema automatizado para extraer, procesar y analizar datos de pedidos desde
 
 3. **Instalar dependencias de Python:**
    ```bash
-   pip install openai pathlib beautifulsoup4
+   pip install openai pathlib beautifulsoup4 colorama
    ```
 
 4. **Configurar Ollama:**
@@ -82,7 +92,28 @@ Un sistema automatizado para extraer, procesar y analizar datos de pedidos desde
 
 ## 🎯 Uso
 
-### Flujo completo de 5 pasos:
+### 🧠 Ejecución Automática con CEREBRO (Recomendado):
+
+El proyecto incluye un **script maestro** que automatiza todo el flujo:
+
+```bash
+# 1. Ejecutar login manual (único paso manual)
+node scripts/login_amazon.js
+
+# 2. Ejecutar el cerebro que hace todo automáticamente
+python cerebro.py
+```
+
+El **CEREBRO** se encarga de:
+- ✅ Verificar prerrequisitos automáticamente
+- ✅ Ejecutar todos los pasos en secuencia
+- ✅ Manejar errores y recuperación
+- ✅ Mostrar progreso detallado
+- ✅ Recuperar desde interrupciones
+
+### 📋 Ejecución Manual Paso a Paso:
+
+Si prefieres control manual, puedes ejecutar cada paso individualmente:
 
 #### **Paso 1: Autenticación** 🔐
 ```bash
@@ -130,6 +161,8 @@ amazon_pedidos/
 │   ├── parser_tabla_llm.py  # Procesamiento principal
 │   ├── parser_detalles_llm.py # Extracción de detalles
 │   └── debug_*.py           # Herramientas de depuración
+├── cerebro.py               # 🧠 SCRIPT MAESTRO - Automatización completa
+├── cerebro_estado.json      # Estado del sistema (auto-generado)
 ├── cookies/                 # Sesiones guardadas (Git ignored)
 ├── html/                    # HTML de páginas (Git ignored)
 ├── html_pedidos/           # HTML individual (Git ignored)
@@ -143,17 +176,34 @@ amazon_pedidos/
 
 ## 🔄 Flujo de Trabajo
 
+### Con CEREBRO (Automatizado):
 ```mermaid
 graph TD
-    A[Login Amazon] --> B[Extraer HTML Lista]
-    B --> C[Procesar con IA]
-    C --> D[Descargar HTML Individual]
-    D --> E[Extraer Detalles Completos]
-    E --> F[Archivos CSV/JSON Final]
+    A[Login Manual] --> B[🧠 CEREBRO]
+    B --> C[Verificar Prerequisites]
+    C --> D[Extraer HTML Lista]
+    D --> E[Procesar con IA]
+    E --> F[Descargar HTML Individual]
+    F --> G[Extraer Detalles Completos]
+    G --> H[Archivos CSV/JSON Final]
     
-    F --> G{¿Nuevos pedidos?}
-    G -->|Sí| B
-    G -->|No| H[Proceso Completo]
+    H --> I{¿Interrumpido?}
+    I -->|Sí| J[Recuperar Estado]
+    J --> D
+    I -->|No| K[Proceso Completo]
+```
+
+### Manual (Paso a Paso):
+```mermaid
+graph TD
+    A[Login Amazon] --> B[Extraer HTML Lista - SIEMPRE]
+    B --> C[Procesar con IA]
+    C --> D{¿Nuevas ventas vs CSV?}
+    D -->|No| E[FIN - No hay nuevas]
+    D -->|Sí| F[Descargar HTML Individual]
+    F --> G[Extraer Detalles Completos]
+    G --> H[AGREGAR al CSV Acumulativo]
+    H --> I[Proceso Completo]
 ```
 
 ## 📊 Datos Extraídos
@@ -222,13 +272,77 @@ curl http://localhost:11434/api/tags
 node scripts/login_amazon.js
 ```
 
-## 📈 Características Avanzadas
+## 🧠 CEREBRO - Script Maestro
+
+### Características del CEREBRO:
+
+- **🔄 Ejecución Automática**: Ejecuta todo el flujo sin intervención
+- **💾 Sistema de Estados**: Recupera desde interrupciones automáticamente
+- **🎨 Logging Detallado**: Output con colores y timestamps
+- **✅ Verificaciones**: Valida prerrequisitos antes de cada paso
+- **⚡ Recuperación Inteligente**: Salta pasos ya completados
+- **�️ Manejo de Errores**: Mensajes claros y recuperación automática
+
+### Comandos del CEREBRO:
+
+```bash
+# Ejecución completa
+python cerebro.py
+
+# Ver estado actual
+python cerebro.py --status
+
+# Reiniciar estado
+python cerebro.py --reset
+
+# Mostrar ayuda
+python cerebro.py --help
+```
+
+## �📈 Características Avanzadas
 
 - **Actualización incremental**: Solo procesa pedidos nuevos
 - **Respaldos automáticos**: Versiones anteriores se guardan automáticamente
 - **Pausas inteligentes**: Evita sobrecargar servidores de Amazon
 - **Manejo de errores**: Logs detallados para troubleshooting
 - **Formato de datos**: Compatible con Excel y herramientas de análisis
+- **Recuperación de estado**: Continúa desde donde se interrumpió
+
+## 📚 Documentación Completa
+
+- **cerebro.py** - Script maestro automatizado (⭐ **RECOMENDADO** ⭐)
+- **instrucciones.md** - Guía paso a paso detallada (manual)
+- **README.md** - Este archivo (documentación general)
+
+### 🚀 Inicio Rápido con CEREBRO
+
+```bash
+# Ejecutar proceso completo automatizado
+python cerebro.py
+```
+
+**🔍 Flujo automático inteligente:**
+1. **Login Manual**: CEREBRO te pide hacer login en otra terminal, espera tu confirmación
+2. **Extracción HTML**: Siempre descarga HTML fresco para detectar nuevas ventas
+3. **Procesamiento IA**: Compara con CSV existente, detecta solo pedidos nuevos
+4. **Descarga Individual**: Solo si hay nuevos, descarga HTML de cada pedido nuevo
+5. **Extracción Detalles**: Agrega detalles completos al CSV consolidado (acumulativo)
+6. **Backup Automático**: Crea respaldo con timestamp automáticamente
+7. **Reset Estado**: Se limpia automáticamente para próxima ejecución
+
+**🔒 Seguridad del Login:**
+- CEREBRO NO ejecuta el login automáticamente por seguridad
+- Te da instrucciones claras para ejecutar en otra terminal
+- Espera tu confirmación antes de continuar
+- Verifica cookies antes de proceder
+
+### 📖 Para Usuarios Avanzados
+
+Si prefieres control total o necesitas debugging, consulta `instrucciones.md` para el flujo manual paso a paso.
+
+### 🔄 CSV Acumulativo
+
+El archivo `pedidos_consolidados.csv` es **acumulativo** - nunca se borra, solo se agregan nuevas ventas. Perfecto para análisis histórico completo.
 
 ## 🤝 Contribuir
 

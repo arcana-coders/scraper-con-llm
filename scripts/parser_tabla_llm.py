@@ -62,12 +62,12 @@ REGEX_ID_PEDIDO = re.compile(r"^\d{3}-\d{7}-\d{7}$")
 
 
 def encontrar_html_mas_reciente(directorio: Path) -> Path | None:
-    print(f"🔎 Buscando archivos HTML en: {directorio}")
+    print(f"Buscando archivos HTML en: {directorio}")
     archivos_html = list(directorio.glob("pedidos_*.html"))
     if not archivos_html:
         return None
     archivo_mas_reciente = max(archivos_html, key=lambda p: p.name)
-    print(f"📄 Se usará el archivo más reciente: {archivo_mas_reciente.name}")
+    print(f"Se usara el archivo mas reciente: {archivo_mas_reciente.name}")
     return archivo_mas_reciente
 
 def limpiar_html_y_guardar(ruta_html: Path, destino_txt: Path) -> str:
@@ -80,7 +80,7 @@ def limpiar_html_y_guardar(ruta_html: Path, destino_txt: Path) -> str:
         tag.decompose()
     texto_limpio = soup.get_text(separator="\n", strip=True)
     destino_txt.write_text(texto_limpio, encoding="utf-8")
-    print(f"🧼 HTML limpio guardado en: {destino_txt}")
+    print(f"HTML limpio guardado en: {destino_txt}")
     return texto_limpio
 
 def dividir_en_pedidos(texto: str) -> list[str]:
@@ -89,7 +89,7 @@ def dividir_en_pedidos(texto: str) -> list[str]:
     indices_inicio = [i for i, linea in enumerate(lineas) if linea.startswith("hace ")]
 
     if not indices_inicio:
-        print("⚠️ No se encontraron marcadores de inicio de pedido ('hace...').")
+        print("ADVERTENCIA: No se encontraron marcadores de inicio de pedido ('hace...').")
         return []
 
     for i, start_index in enumerate(indices_inicio):
@@ -195,7 +195,7 @@ def main():
                     ids_existentes = {p.get("id_pedido") for p in pedidos_existentes if p.get("id_pedido")}
             print(f"🔍 Encontrados {len(pedidos_existentes)} pedidos existentes.")
         except json.JSONDecodeError:
-             print("⚠️ El archivo JSON existe pero está vacío o corrupto.")
+             print("ADVERTENCIA: El archivo JSON existe pero esta vacio o corrupto.")
              pedidos_existentes = []
              ids_existentes = set()
     else:
@@ -206,7 +206,7 @@ def main():
         id_candidato = extraer_id_del_bloque(bloque)
         
         if not id_candidato:
-            print(f"⚠️ Bloque #{i} no contiene un ID de pedido válido. Se omite.")
+            print(f"ADVERTENCIA: Bloque #{i} no contiene un ID de pedido valido. Se omite.")
             continue
 
         if id_candidato in ids_existentes:
@@ -253,7 +253,7 @@ def main():
         
         guardar_csv(OUTPUT_CSV_CONSOLIDADO, lista_final)
 
-    print("\n✅ Proceso completado.")
+    print("\nProceso completado exitosamente.")
 
 if __name__ == "__main__":
     main()
