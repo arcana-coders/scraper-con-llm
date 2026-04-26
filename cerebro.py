@@ -17,6 +17,7 @@ import sys
 import json
 import subprocess
 import time
+import shutil
 from datetime import datetime
 from pathlib import Path
 import requests
@@ -652,23 +653,24 @@ class CerebroAmazonPedidos:
         """Crea backup automático de archivos finales con timestamp"""
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            
+
             json_file = CSV_DIR / "pedidos_consolidados.json"
             csv_file = CSV_DIR / "pedidos_consolidados.csv"
             backup_dir = CSV_DIR / "backup"
-            
+
+            # Asegurar que el directorio de backup existe
+            backup_dir.mkdir(parents=True, exist_ok=True)
+
             if json_file.exists():
                 backup_json = backup_dir / f"pedidos_consolidados_{timestamp}.json"
-                json_file.replace(backup_json.parent / backup_json.name)
-                backup_json.write_bytes(json_file.read_bytes())
+                shutil.copy2(json_file, backup_json)  # COPIA en lugar de mover
                 Logger.success(f"Backup JSON creado: {backup_json.name}")
-            
+
             if csv_file.exists():
                 backup_csv = backup_dir / f"pedidos_consolidados_{timestamp}.csv"
-                csv_file.replace(backup_csv.parent / backup_csv.name)
-                backup_csv.write_bytes(csv_file.read_bytes())
+                shutil.copy2(csv_file, backup_csv)  # COPIA en lugar de mover
                 Logger.success(f"Backup CSV creado: {backup_csv.name}")
-                
+
         except Exception as e:
             Logger.warning(f"No se pudo crear backup automático: {e}")
             Logger.info("Los archivos principales siguen disponibles")

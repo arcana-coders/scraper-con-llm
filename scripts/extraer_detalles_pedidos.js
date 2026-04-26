@@ -62,7 +62,7 @@ function sleep(min_ms, max_ms) {
 
     // 4. Iniciar el navegador
     console.log('🚀 Iniciando navegador...');
-    const browser = await chromium.launch({ headless: false }); // Cambiar a true para modo silencioso
+    const browser = await chromium.launch({ headless: true }); // Cambiar a true para modo silencioso
     const context = await browser.newContext({ storageState: COOKIES_PATH });
 
     // 5. Iterar y descargar cada página
