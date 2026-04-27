@@ -32,7 +32,9 @@ const HTML_OUTPUT_PATH = path.join(__dirname, `../html/pedidos_${getFormattedDat
 
     console.log('🚀 Iniciando proceso de extracción de HTML...');
     // Puedes cambiar headless a false para ver el proceso en pantalla
-    const browser = await chromium.launch({ headless: true }); 
+    const browser = await chromium.launch({
+        headless: true // Cambiado a true para evitar abrir ventana
+    }); 
 
     try {
         console.log('- Cargando contexto del navegador con la sesión guardada...');
