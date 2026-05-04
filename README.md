@@ -174,6 +174,46 @@ amazon_pedidos/
 └── README.md              # Este archivo
 ```
 
+## 🗄️ Sincronización con Base de Datos Central (CAPALSA)
+
+Después de cada corrida del robot, los nuevos pedidos se suben al PostgreSQL en Tecnómata Node-1.
+
+### Flujo completo de una corrida semanal:
+
+```
+1. node scripts/login_amazon.js   ← login manual (cookies ~6h)
+2. python cerebro.py              ← extrae y actualiza pedidos_consolidados.csv
+3. node upsert-to-db.js           ← sube solo los registros nuevos a la BD
+```
+
+### ¿Cómo funciona el upsert?
+
+- Lee `csv/pedidos_consolidados.csv` completo
+- Por cada fila, intenta insertar en la tabla `ventas` usando `id_pedido` como clave única
+- Si el pedido ya existe → lo ignora (`ON CONFLICT DO NOTHING`)
+- Si es nuevo → lo inserta
+- Al final imprime: `Insertados: X | Ya existían: Y | Total CSV: Z`
+
+### Conexión
+
+- **Host:** 192.168.1.175 (Tecnómata Node-1 — red local)
+- **Puerto:** 5432
+- **BD:** capalsa
+- **Tabla:** ventas
+
+### Verificar qué hay en la BD
+
+```bash
+# SSH al servidor
+ssh arturo@192.168.1.175
+
+# Consulta rápida
+docker exec capalsa-postgres psql -U capalsa -d capalsa -c \
+  "SELECT COUNT(*) as total, MAX(fecha_pedido) as ultima_venta FROM ventas;"
+```
+
+---
+
 ## 🔄 Flujo de Trabajo
 
 ### Con CEREBRO (Automatizado):
